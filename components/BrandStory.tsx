@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { IMAGES, COLOR_GREEN, COLOR_GRAY } from '../constants';
 
@@ -19,13 +19,60 @@ const FadeInSection: React.FC<{ children: React.ReactNode; delay?: number }> = (
 );
 
 const BrandStory: React.FC<BrandStoryProps> = ({ onBack }) => {
-  // Scroll to top when this component mounts (page transition)
-  useEffect(() => {
-    window.scrollTo(0, 0);
+  const topFocusRef = useRef<HTMLDivElement>(null);
+
+  // ROBUST SCROLL RESET STRATEGY FOR TABLET/MOBILE
+  useLayoutEffect(() => {
+    // 1. Enforce manual scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // 2. The "Focus Hack":
+    // Focusing an element forces the browser to scroll it into view.
+    // By placing a hidden element at (0,0) and focusing it, we force the viewport to the top.
+    // This is often more reliable than window.scrollTo on complex mobile pages.
+    if (topFocusRef.current) {
+      topFocusRef.current.focus({ preventScroll: false });
+    }
+
+    // 3. Fallback: Standard scrollTo with redundancy
+    const forceScrollTop = () => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    };
+
+    forceScrollTop();
+
+    // 4. Persistence:
+    // Sometimes the browser layout settles a few frames later (e.g. after images layout).
+    // We force the scroll position for the first few critical frames.
+    const frames = [0, 1, 2, 5, 10]; // Frame count
+    frames.forEach(frame => {
+      requestAnimationFrame(() => {
+         // Nested requestAnimationFrame to space them out
+         for(let i=0; i<frame; i++) requestAnimationFrame(() => {});
+         forceScrollTop();
+      });
+    });
+    
+    // Also a slight timeout for good measure (handling slow main-thread execution)
+    const timeoutId = setTimeout(forceScrollTop, 100);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
     <div className="w-full bg-[#fcfcfc] text-[#1a1a1a] min-h-screen relative">
+      {/* Hidden Focus Anchor for Scroll Reset */}
+      <div 
+        ref={topFocusRef} 
+        tabIndex={-1} 
+        className="absolute top-0 left-0 w-px h-px outline-none pointer-events-none opacity-0"
+        aria-hidden="true"
+      />
+
       {/* Back Button */}
       <nav className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference text-white">
         <button 

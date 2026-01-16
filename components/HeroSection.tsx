@@ -12,12 +12,17 @@ const HeroSection: React.FC = () => {
         <div className="relative shadow-2xl overflow-hidden rounded-sm bg-white max-h-[85vh] max-w-[90vw]">
           
           {/* Base Image (Model) */}
-          {/* block element to remove bottom spacing from inline-block images */}
-          <img 
-            src={IMAGES.model} 
-            alt="Model" 
-            className="block w-auto h-auto max-h-[85vh] max-w-full pointer-events-none select-none"
-          />
+          {/* Using picture tag for responsive image switching */}
+          <picture className="block w-auto h-auto max-h-[85vh] max-w-full pointer-events-none select-none">
+            {/* Show high-res portrait image on tablets and mobile (max-width: 1024px) */}
+            <source media="(max-width: 1024px)" srcSet={IMAGES.modelHighRes} />
+            {/* Fallback to original image on desktop */}
+            <img 
+              src={IMAGES.model} 
+              alt="Model" 
+              className="block w-auto h-auto max-h-[85vh] max-w-full"
+            />
+          </picture>
 
           {/* Canvas Overlay for Ink Effect */}
           <InkCanvas />

@@ -9,6 +9,11 @@ export const COLOR_GRAY = '#7D7874';
 export const IMAGES = {
   // Existing Assets
   model: 'https://drive.google.com/thumbnail?id=1yde5arQSmoO41CtfaynHwjBUMK7txMfi&sz=w3000',
+  
+  // New High-Res Assets for Mobile/Tablet (Portrait aspect ratio)
+  modelHighRes: 'https://drive.google.com/thumbnail?id=110G69AXzvWKqLQdvV9BCd-LVmd7W1wBt&sz=w3000',
+  tshirtHighRes: 'https://drive.google.com/thumbnail?id=1AqbuZzh2ynYKveoB3CtQcRc5cz7mP8QD&sz=w3000',
+
   background: 'https://drive.google.com/thumbnail?id=1yeWYAml1z_UgC5ERJEUU0M24GDXLbmo6&sz=w3000',
   tshirt: 'https://drive.google.com/thumbnail?id=1B5-sRbNrwMf9wFr8koLihnXb99XUAmWa&sz=w3000&v=2',
   

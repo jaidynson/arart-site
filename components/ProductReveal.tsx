@@ -56,11 +56,15 @@ const ProductReveal: React.FC<ProductRevealProps> = ({ onDiscover }) => {
           }}
           className="relative z-10 w-full max-w-sm md:max-w-xl p-4 flex justify-center items-center"
         >
-          <img 
-            src={IMAGES.tshirt} 
-            alt="ARA T-Shirt Object" 
-            className="w-full h-auto max-h-[70vh] object-contain drop-shadow-2xl"
-          />
+          {/* Responsive Image Switching */}
+          <picture>
+            <source media="(max-width: 1024px)" srcSet={IMAGES.tshirtHighRes} />
+            <img 
+              src={IMAGES.tshirt} 
+              alt="ARA T-Shirt Object" 
+              className="w-full h-auto max-h-[70vh] object-contain drop-shadow-2xl"
+            />
+          </picture>
         </motion.div>
 
         {/* Text/CTA Layer */}

@@ -59,6 +59,18 @@ const InkCanvas: React.FC = () => {
     createInkSplat(x, y);
   };
 
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    // Handle the first touch point
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    createInkSplat(x, y);
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -68,11 +80,27 @@ const InkCanvas: React.FC = () => {
     const setSize = () => {
       const parent = canvas.parentElement;
       if (parent) {
+        // Ensure we capture the new dimensions from the parent
+        // which might change after the image loads
         canvas.width = parent.offsetWidth;
         canvas.height = parent.offsetHeight;
       }
     };
+
+    // Initial sizing
     setSize();
+
+    // ResizeObserver allows us to react when the parent container changes size
+    // (e.g., when the underlying image finally loads and expands the div)
+    const resizeObserver = new ResizeObserver(() => {
+      setSize();
+    });
+
+    if (canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
+    
+    // Fallback for window resizing
     window.addEventListener('resize', setSize);
 
     const render = () => {
@@ -120,6 +148,7 @@ const InkCanvas: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', setSize);
+      resizeObserver.disconnect();
       if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
     };
   }, []);
@@ -128,6 +157,7 @@ const InkCanvas: React.FC = () => {
     <canvas
       ref={canvasRef}
       onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
       // mix-blend-multiply allows the ink colors to "stain" the photo below
       className="absolute inset-0 w-full h-full cursor-crosshair z-10 touch-none mix-blend-multiply"
     />

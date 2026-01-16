@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeroSection from './components/HeroSection';
 import ProductReveal from './components/ProductReveal';
 import BrandStory from './components/BrandStory';
@@ -8,9 +8,29 @@ import { AnimatePresence, motion } from 'framer-motion';
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'home' | 'story'>('home');
 
+  useEffect(() => {
+    // Global setting for scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+  }, []);
+
   return (
     <main className="w-full min-h-screen bg-neutral-50">
-      <AnimatePresence mode="wait">
+      <AnimatePresence 
+        mode="wait" 
+        onExitComplete={() => {
+          // Primary Reset:
+          // We also trigger a scroll reset here. 
+          // While BrandStory handles it internally with focus, this covers the 'Home' view return 
+          // or any gap between unmount/mount where the browser might try to be clever.
+          if (typeof window !== 'undefined') {
+             // Use scrollTo instead of 'instant' behavior sometimes helps Safari register the change
+             // during high-load paint cycles.
+             window.scrollTo(0, 0);
+          }
+        }}
+      >
         {currentView === 'home' ? (
           <motion.div
             key="home"
